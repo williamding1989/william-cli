@@ -100,7 +100,7 @@ export const write = (path, file, fmt = 'utf-8') => {
 }
 
 // PackageJson
-export const pkg = JSON.parse(read('package1.json'))
+export const pkg = JSON.parse(read('package.json'))
 
 // Fse
 export const { move } = fse
