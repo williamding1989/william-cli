@@ -16,6 +16,7 @@ import {
   Bodyparser,
   Router,
   Static,
+  download,
 } from './dep.js'
 
 // Create Prompt
@@ -130,21 +131,21 @@ export const spn = (cmd, args, cb = () => {}) => {
   const { pid, killed } = child
 
   child.stdout.on('data', (data) => {
-    console.log(`>>>> [${pid}] stdout: ${data}`)
+    $console.log(`>>>> [${pid}] stdout: ${data}`)
     cb(data)
   })
 
   child.stderr.on('data', (data) => {
-    console.error(`>>>> [${pid}] stderr: ${data}`)
+    $console.error(`>>>> [${pid}] stderr: ${data}`)
   })
 
   child.on('close', (code) => {
-    console.log(`>>>> [${pid}] 子进程退出，退出码 ${code}`)
+    $console.log(`>>>> [${pid}] 子进程退出，退出码 ${code}`)
   })
 }
 
 // Service By Koa
-export const service = ({ port = 3000, staticdir, routes }) => {
+export const service = ({ port = 3000, staticdir, routes = [] }) => {
   // New Instance
   const app = new Koa()
 
@@ -168,6 +169,25 @@ export const service = ({ port = 3000, staticdir, routes }) => {
 
   // Launch
   app.listen(port, () => {
-    console.log(`Koa server is running at http://localhost:${port}`)
+    $console.log(`Koa server is running at http://localhost:${port}`)
+  })
+}
+
+/**
+ * GitClone
+ * @param {String} repoUrl     仓库地址
+ * @param {String} destination  目标文件存放位置
+ * @param {Object} options  配置
+ */
+export const gitclone = (repoUrl, destination, options = {}) => {
+  // Combine Options
+  options = Object.assign({ clone: false }, options)
+
+  download(repoUrl, destination, options, function (err) {
+    if (err) {
+      $console.error('下载失败:', err)
+    } else {
+      $console.log('下载成功')
+    }
   })
 }

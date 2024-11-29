@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 
 // Use Kit
-import { pkg, rl, program } from '../utils/kit.js'
+import { pkg, rl, program, joint, write, gitclone } from '../utils/kit.js'
 
 // Set Version
 program.version(`v${pkg.version}`)
 
+// Init CLi
 program
   .command('start')
   .description('开启部署监听服务')
   .option('-p, --port <port>', '指定部署服务监听端口')
-  .option('-w, --password <key>', '设置登录密码')
   .action(async (options) => {
-    let { port, password } = options
+    let { port } = options
     const args =
       // 指令行中是否带参数
-      port && password
-        ? { port, password }
+      port
+        ? { port }
         : await rl([
             {
               type: 'number',
@@ -28,17 +28,18 @@ program
                   ? `端口号必须在 3000 - 10000 之间`
                   : true,
             },
-            {
-              type: 'password',
-              name: 'password',
-              message: '请设置登录密码',
-              mask: true,
-              validate: (value) =>
-                value.length < 6 ? `密码需要 6 位以上` : true,
-            },
           ])
 
-    console.log('args', args)
+    // Write Config
+    write('server/config.js', JSON.stringify(args))
+
+    // Joint PM2
+    joint([
+      {
+        command:
+          'pm2 restart koa-service|| pm2 start server/index.js -n "koa-service"',
+      },
+    ])
   })
 
 program.parse()

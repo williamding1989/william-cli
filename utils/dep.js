@@ -39,3 +39,6 @@ export { default as Router } from 'koa-router'
 
 // Use Static
 export { default as Static } from 'koa-static'
+
+// Use download Git
+export { default as download } from 'download-git-repo'
